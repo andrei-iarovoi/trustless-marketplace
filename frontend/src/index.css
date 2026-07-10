@@ -75,6 +75,11 @@
       linear-gradient(180deg, #07111d 0%, var(--background) 42%);
   }
 
+  #root {
+    min-height: 100vh;
+    padding: 4rem 1.5rem;
+  }
+
   button,
   input,
   textarea,
