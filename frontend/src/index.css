@@ -15,9 +15,17 @@
   --muted-foreground: #64748b;
   --card: #0b1017;
   --card-foreground: #f8fafc;
+  --popover: #0b1017;
+  --popover-foreground: #f8fafc;
   --border: #1e293b;
+  --input: #1e293b;
   --primary: #22d3ee;
   --primary-foreground: #042f3a;
+  --secondary: #111827;
+  --secondary-foreground: #e2e8f0;
+  --accent: #0e7490;
+  --accent-foreground: #ecfeff;
+  --destructive: #ef4444;
   --ring: #67e8f9;
 }
 
@@ -31,9 +39,17 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
   --color-border: var(--border);
+  --color-input: var(--input);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
   --color-ring: var(--ring);
 
   --radius-card: 1.25rem;
