@@ -1,32 +1,36 @@
-import { createBrowserRouter } from 'react-router'
+import { createBrowserRouter } from "react-router";
 
-import { DashboardPage } from '@/pages/Dashboard/DashboardPage'
-import { LandingPage } from '@/pages/Landing/LandingPage'
-import { MarketplacePage } from '@/pages/Marketplace/MarketplacePage'
-import { MyOrdersPage } from '@/pages/MyOrders/MyOrdersPage'
-import { OrderDetailsPage } from '@/pages/OrderDetails/OrderDetailsPage'
+import { AppLayout } from "@/components/layout/AppLayout";
+import { DashboardPage } from "@/pages/Dashboard/DashboardPage";
+import { LandingPage } from "@/pages/Landing/LandingPage";
+import { MarketplacePage } from "@/pages/Marketplace/MarketplacePage";
+import { MyOrdersPage } from "@/pages/MyOrders/MyOrdersPage";
+import { OrderDetailsPage } from "@/pages/OrderDetails/OrderDetailsPage";
 
-const router = createBrowserRouter([
+export const router = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: <LandingPage />,
   },
   {
-    path: '/marketplace',
-    element: <MarketplacePage />,
+    element: <AppLayout />,
+    children: [
+      {
+        path: "/marketplace",
+        element: <MarketplacePage />,
+      },
+      {
+        path: "/order/:id",
+        element: <OrderDetailsPage />,
+      },
+      {
+        path: "/my-orders",
+        element: <MyOrdersPage />,
+      },
+      {
+        path: "/dashboard",
+        element: <DashboardPage />,
+      },
+    ],
   },
-  {
-    path: '/orders/:orderId',
-    element: <OrderDetailsPage />,
-  },
-  {
-    path: '/my-orders',
-    element: <MyOrdersPage />,
-  },
-  {
-    path: '/dashboard',
-    element: <DashboardPage />,
-  },
-])
-
-export { router }
+]);
