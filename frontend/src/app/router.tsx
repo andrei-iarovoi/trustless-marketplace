@@ -20,7 +20,7 @@ export const router = createBrowserRouter([
         element: <MarketplacePage />,
       },
       {
-        path: "/order/:id",
+        path: "/orders/:orderId",
         element: <OrderDetailsPage />,
       },
       {

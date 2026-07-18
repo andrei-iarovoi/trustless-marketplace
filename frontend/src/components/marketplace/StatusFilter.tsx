@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { Button } from "@/components/ui/button";
 
 const filters = [
   "All",
@@ -6,34 +6,29 @@ const filters = [
   "Accepted",
   "Funded",
   "Completed",
+  "Cancelled",
 ] as const;
 
 export type StatusFilterValue = (typeof filters)[number];
 
-interface StatusFilterProps {
+type StatusFilterProps = {
   value: StatusFilterValue;
   onChange: (value: StatusFilterValue) => void;
-}
+};
 
-export function StatusFilter({
-  value,
-  onChange,
-}: StatusFilterProps) {
+export function StatusFilter({ value, onChange }: StatusFilterProps) {
   return (
     <div className="flex flex-wrap gap-2">
       {filters.map((filter) => (
-        <button
+        <Button
           key={filter}
+          type="button"
+          size="sm"
+          variant={value === filter ? "default" : "secondary"}
           onClick={() => onChange(filter)}
-          className={clsx(
-            "rounded-lg border px-4 py-2 text-sm transition",
-            value === filter
-              ? "border-cyan-500 bg-cyan-500 text-slate-950"
-              : "border-slate-800 bg-slate-900 hover:border-slate-700"
-          )}
         >
           {filter}
-        </button>
+        </Button>
       ))}
     </div>
   );
