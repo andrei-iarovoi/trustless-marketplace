@@ -1,41 +1,76 @@
-import { Search } from 'lucide-react'
+import { useMemo, useState } from "react";
+import { Plus } from "lucide-react";
 
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { PageHeader } from '@/pages/PageHeader'
+import { OrderCard } from "@/components/marketplace/OrderCard";
+import {
+  SearchBar,
+} from "@/components/marketplace/SearchBar";
+import {
+  StatusFilter,
+  type StatusFilterValue,
+} from "@/components/marketplace/StatusFilter";
+import { Container } from "@/components/layout/Container";
+import { mockOrders } from "@/data/mockOrders";
 
-function MarketplacePage() {
+export function MarketplacePage() {
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState<StatusFilterValue>("All");
+
+  const orders = useMemo(() => {
+    return mockOrders.filter((order) => {
+      const matchesSearch = order.title
+        .toLowerCase()
+        .includes(search.toLowerCase());
+
+      const matchesStatus =
+        status === "All" || order.status === status;
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [search, status]);
+
   return (
-    <div className="space-y-8">
-      <PageHeader
-        eyebrow="Marketplace"
-        title="Browse open escrow orders."
-        description="Search and filter orders before connecting wallet actions to the deployed Sepolia contract."
-      />
+    <Container className="py-12">
+      <div className="mb-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <h1 className="text-4xl font-bold tracking-tight">
+            Marketplace
+          </h1>
 
-      <div className="relative max-w-xl">
-        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-        <Input className="pl-9" placeholder="Search by title, address, or status" />
+          <p className="mt-2 text-slate-400">
+            Browse escrow orders and start collaborating securely.
+          </p>
+        </div>
+
+        <button className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-5 py-3 font-medium text-slate-950 transition hover:bg-cyan-400">
+          <Plus size={18} />
+          Create Order
+        </button>
       </div>
 
-      <section className="grid gap-4 lg:grid-cols-2">
-        {['Open', 'Accepted', 'Funded', 'Completed'].map((status) => (
-          <Card key={status}>
-            <CardHeader>
-              <div className="flex items-center justify-between gap-4">
-                <CardTitle>Sample marketplace order</CardTitle>
-                <Badge>{status}</Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="text-sm leading-6 text-muted">
-              Order cards will render contract data through hooks and services.
-            </CardContent>
-          </Card>
-        ))}
-      </section>
-    </div>
-  )
-}
+      <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <SearchBar value={search} onChange={setSearch} />
 
-export { MarketplacePage }
+        <StatusFilter
+          value={status}
+          onChange={setStatus}
+        />
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        {orders.map((order) => (
+          <OrderCard
+            key={order.id}
+            order={order}
+          />
+        ))}
+      </div>
+
+      {orders.length === 0 && (
+        <div className="rounded-2xl border border-dashed border-slate-700 py-16 text-center text-slate-400">
+          No orders found.
+        </div>
+      )}
+    </Container>
+  );
+}

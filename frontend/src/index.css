@@ -76,9 +76,8 @@
   }
 
   #root {
-    min-height: 100vh;
-    padding: 4rem 1.5rem;
-  }
+  min-height: 100vh;
+ }
 
   button,
   input,
