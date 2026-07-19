@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ClipboardList, Plus } from "lucide-react";
+import { ClipboardList } from "lucide-react";
 
 import { MarketplaceStats } from "@/components/marketplace/MarketplaceStats";
 import { OrderCard } from "@/components/marketplace/OrderCard";
@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Container } from "@/components/layout/Container";
+import { CreateOrderDialog } from "@/components/orders/CreateOrderDialog";
 import { mockOrders } from "@/data/mockOrders";
 
 export function MarketplacePage() {
@@ -41,19 +42,18 @@ export function MarketplacePage() {
           <p className="text-sm font-medium uppercase tracking-[0.24em] text-cyan-300">
             Marketplace
           </p>
+
           <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-50 sm:text-5xl">
             Discover trustless escrow orders.
           </h1>
+
           <p className="mt-4 max-w-2xl text-base leading-7 text-slate-400">
             Browse marketplace opportunities, inspect counterparties, and move
             orders through the escrow lifecycle with clear on-chain actions.
           </p>
         </div>
 
-        <Button size="lg">
-          <Plus size={18} />
-          Create Order
-        </Button>
+        <CreateOrderDialog />
       </section>
 
       <MarketplaceStats orders={mockOrders} />
