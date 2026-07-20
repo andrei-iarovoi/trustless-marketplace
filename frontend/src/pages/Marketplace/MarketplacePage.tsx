@@ -8,32 +8,40 @@ import {
   StatusFilter,
   type StatusFilterValue,
 } from "@/components/marketplace/StatusFilter";
-import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/empty-state";
 import { Container } from "@/components/layout/Container";
 import { CreateOrderDialog } from "@/components/orders/CreateOrderDialog";
-import { mockOrders } from "@/data/mockOrders";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { useOrders } from "@/hooks/marketplace";
 
 export function MarketplacePage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<StatusFilterValue>("All");
 
+  const { orders, isLoading } = useOrders();
+
   const normalizedSearch = search.trim().toLowerCase();
 
   const filteredOrders = useMemo(() => {
-    return mockOrders.filter((order) => {
+    return orders.filter((order) => {
       const matchesSearch =
         normalizedSearch.length === 0 ||
-        [order.title, order.buyer, order.seller ?? "", order.status]
+        [
+          order.description,
+          order.client,
+          order.freelancer ?? "",
+          order.status,
+        ]
           .join(" ")
           .toLowerCase()
           .includes(normalizedSearch);
 
-      const matchesStatus = status === "All" || order.status === status;
+      const matchesStatus =
+        status === "All" || order.status === status;
 
       return matchesSearch && matchesStatus;
     });
-  }, [normalizedSearch, status]);
+  }, [orders, normalizedSearch, status]);
 
   return (
     <Container className="space-y-10 py-12">
@@ -56,7 +64,7 @@ export function MarketplacePage() {
         <CreateOrderDialog />
       </section>
 
-      <MarketplaceStats orders={mockOrders} />
+      <MarketplaceStats orders={orders} />
 
       <section className="space-y-6">
         <div className="flex flex-col gap-4 rounded-2xl border border-slate-800 bg-slate-900/60 p-4 lg:flex-row lg:items-center lg:justify-between">
@@ -64,7 +72,11 @@ export function MarketplacePage() {
           <StatusFilter value={status} onChange={setStatus} />
         </div>
 
-        {filteredOrders.length > 0 ? (
+        {isLoading ? (
+          <div className="py-20 text-center text-slate-400">
+            Loading orders...
+          </div>
+        ) : filteredOrders.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {filteredOrders.map((order) => (
               <OrderCard key={order.id} order={order} />
@@ -74,7 +86,7 @@ export function MarketplacePage() {
           <EmptyState
             icon={<ClipboardList size={22} />}
             title="No orders found"
-            description="Try adjusting the search query or status filter. New escrow orders will appear here once they are indexed."
+            description="Try adjusting the search query or status filter."
             action={
               <Button
                 variant="secondary"

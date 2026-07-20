@@ -7,10 +7,14 @@ export type OrderStatus =
 
 export interface Order {
   id: number;
-  title: string;
-  budget: number;
-  deadline: string;
-  buyer: string;
-  seller?: string;
+
+  description: string;
+
+  amount: number;
+
+  client: string;
+
+  freelancer?: string;
+
   status: OrderStatus;
 }
