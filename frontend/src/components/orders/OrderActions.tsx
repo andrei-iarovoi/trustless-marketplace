@@ -1,10 +1,12 @@
+import { useAccount } from "wagmi";
+import { parseEther } from "viem";
+
 import {
   useAcceptOrder,
   useCancelOrder,
   useConfirmCompletion,
   useFundOrder,
 } from "@/hooks/marketplace";
-import { parseEther } from "viem";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,15 +20,21 @@ import type { OrderStatus } from "@/types/order";
 
 interface OrderActionsProps {
   orderId: number;
-  budget: number;
+  amount: number;
+  client: string;
+  freelancer?: string;
   status: OrderStatus;
 }
 
 export function OrderActions({
   orderId,
-  budget,
+  amount,
+  client,
+  // freelancer,
   status,
 }: OrderActionsProps) {
+  const { address } = useAccount();
+
   const {
     acceptOrder,
     isPending: isAcceptPending,
@@ -55,18 +63,46 @@ export function OrderActions({
     error: cancelError,
   } = useCancelOrder();
 
-  const canAccept = status === "Open";
-  const canFund = status === "Accepted";
-  const canComplete = status === "Funded";
-  const canCancel =
-    status === "Open" ||
-    status === "Accepted" ||
-    status === "Funded";
+  const normalizedAddress = address?.toLowerCase();
+  const normalizedClient = client.toLowerCase();
+  // const normalizedFreelancer = freelancer?.toLowerCase();
 
-  const isAccepting = isAcceptPending || isAcceptConfirming;
-  const isFunding = isFundPending || isFundConfirming;
+  const isClient = normalizedAddress === normalizedClient;
+  // const isFreelancer =
+  //   normalizedAddress !== undefined &&
+  //   normalizedAddress === normalizedFreelancer;
+
+  const canAccept =
+    status === "Open" &&
+    !!address &&
+    !isClient;
+
+  const canFund =
+    status === "Accepted" &&
+    !!address &&
+    isClient;
+
+  const canComplete =
+    status === "Funded" &&
+    !!address &&
+    isClient;
+
+  const canCancel =
+    !!address &&
+    isClient &&
+    (status === "Open" ||
+      status === "Accepted" ||
+      status === "Funded");
+
+  const isAccepting =
+    isAcceptPending || isAcceptConfirming;
+
+  const isFunding =
+    isFundPending || isFundConfirming;
+
   const isCompleting =
     isCompletePending || isCompleteConfirming;
+
   const isCancelling =
     isCancelPending || isCancelConfirming;
 
@@ -77,7 +113,7 @@ export function OrderActions({
   const handleFund = () => {
     fundOrder({
       orderId,
-      amount: parseEther(budget.toString()),
+      amount: parseEther(amount.toString()),
     });
   };
 
@@ -101,7 +137,9 @@ export function OrderActions({
           disabled={!canAccept || isAccepting}
           onClick={handleAccept}
         >
-          {isAccepting ? "Accepting Order..." : "Accept Order"}
+          {isAccepting
+            ? "Accepting Order..."
+            : "Accept Order"}
         </Button>
 
         <Button
@@ -109,7 +147,9 @@ export function OrderActions({
           disabled={!canFund || isFunding}
           onClick={handleFund}
         >
-          {isFunding ? "Funding Escrow..." : "Fund Escrow"}
+          {isFunding
+            ? "Funding Escrow..."
+            : "Fund Escrow"}
         </Button>
 
         <Button
@@ -128,7 +168,9 @@ export function OrderActions({
           disabled={!canCancel || isCancelling}
           onClick={handleCancel}
         >
-          {isCancelling ? "Cancelling Order..." : "Cancel Order"}
+          {isCancelling
+            ? "Cancelling Order..."
+            : "Cancel Order"}
         </Button>
 
         {acceptError && (

@@ -106,8 +106,10 @@ export function OrderDetailsPage() {
           </div>
 
           <OrderActions orderId={order.id}
-                        budget={order.amount}
-                        status={order.status} 
+                        amount={order.amount}
+                        client={order.client}
+                        freelancer={order.freelancer}
+                        status={order.status}
           />
         </CardContent>
       </Card>
