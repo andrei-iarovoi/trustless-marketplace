@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { parseEther } from "viem";
+
 import {
   Dialog,
   DialogContent,
@@ -12,20 +14,44 @@ import {
   CreateOrderForm,
   type CreateOrderFormData,
 } from "./CreateOrderForm";
+import { useCreateOrder } from "@/hooks/marketplace";
 
 export function CreateOrderDialog() {
   const [open, setOpen] = useState(false);
 
-  const handleSubmit = (data: CreateOrderFormData) => {
-    console.log("Create Order:", data);
+  const {
+    createOrder,
+    isPending,
+    isConfirming,
+    isSuccess,
+    error,
+  } = useCreateOrder();
 
-    // Здесь позже будет writeContract()
-
-    setOpen(false);
+  const handleSubmit = async (data: CreateOrderFormData) => {
+    try {
+      await createOrder({
+        description: data.description,
+        amount: parseEther(data.amount),
+      });
+    } catch {
+      // Ошибка уже доступна через useCreateOrder().
+    }
   };
 
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (isPending || isConfirming) {
+      return;
+    }
+
+    setOpen(nextOpen);
+  };
+
+  if (isSuccess && open) {
+    setOpen(false);
+  }
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button>Create Order</Button>
       </DialogTrigger>
@@ -35,14 +61,28 @@ export function CreateOrderDialog() {
           <DialogTitle>Create New Order</DialogTitle>
 
           <DialogDescription>
-            Fill in the project details to publish a new escrow order.
+            Create a new escrow order on Sepolia. Your connected
+            wallet will become the client.
           </DialogDescription>
         </DialogHeader>
 
         <CreateOrderForm
           onSubmit={handleSubmit}
           onCancel={() => setOpen(false)}
+          isPending={isPending || isConfirming}
         />
+
+        {error && (
+          <p className="text-sm text-destructive">
+            {error.message}
+          </p>
+        )}
+
+        {isConfirming && (
+          <p className="text-sm text-slate-400">
+            Waiting for transaction confirmation...
+          </p>
+        )}
       </DialogContent>
     </Dialog>
   );

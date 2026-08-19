@@ -1,30 +1,29 @@
 import { useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 export interface CreateOrderFormData {
-  title: string;
   description: string;
-  price: string;
-  seller: string;
+  amount: string;
 }
 
 interface CreateOrderFormProps {
   onSubmit: (data: CreateOrderFormData) => void;
   onCancel?: () => void;
+  isPending?: boolean;
 }
 
 export function CreateOrderForm({
   onSubmit,
   onCancel,
+  isPending = false,
 }: CreateOrderFormProps) {
   const [form, setForm] = useState<CreateOrderFormData>({
-    title: "",
     description: "",
-    price: "",
-    seller: "",
+    amount: "",
   });
 
   const [errors, setErrors] = useState<
@@ -33,7 +32,7 @@ export function CreateOrderForm({
 
   const updateField = (
     field: keyof CreateOrderFormData,
-    value: string
+    value: string,
   ) => {
     setForm((prev) => ({
       ...prev,
@@ -47,29 +46,25 @@ export function CreateOrderForm({
   };
 
   const validate = () => {
-    const nextErrors: Partial<Record<keyof CreateOrderFormData, string>> = {};
-
-    if (!form.title.trim()) {
-      nextErrors.title = "Project title is required.";
-    }
+    const nextErrors: Partial<
+      Record<keyof CreateOrderFormData, string>
+    > = {};
 
     if (!form.description.trim()) {
       nextErrors.description = "Description is required.";
-    } else if (form.description.length < 20) {
+    } else if (form.description.trim().length < 20) {
       nextErrors.description =
         "Description should contain at least 20 characters.";
     }
 
-    if (!form.price.trim()) {
-      nextErrors.price = "Price is required.";
-    } else if (Number(form.price) <= 0 || Number.isNaN(Number(form.price))) {
-      nextErrors.price = "Price must be greater than 0.";
-    }
+    if (!form.amount.trim()) {
+      nextErrors.amount = "Amount is required.";
+    } else {
+      const amount = Number(form.amount);
 
-    if (!form.seller.trim()) {
-      nextErrors.seller = "Seller address is required.";
-    } else if (!/^0x[a-fA-F0-9]{40}$/.test(form.seller)) {
-      nextErrors.seller = "Enter a valid Ethereum address.";
+      if (Number.isNaN(amount) || amount <= 0) {
+        nextErrors.amount = "Amount must be greater than 0.";
+      }
     }
 
     setErrors(nextErrors);
@@ -77,20 +72,25 @@ export function CreateOrderForm({
     return Object.keys(nextErrors).length === 0;
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
     event.preventDefault();
 
-    if (!validate()) return;
+    if (!validate() || isPending) {
+      return;
+    }
 
-    onSubmit(form);
+    onSubmit({
+      description: form.description.trim(),
+      amount: form.amount,
+    });
   };
 
   const handleReset = () => {
     setForm({
-      title: "",
       description: "",
-      price: "",
-      seller: "",
+      amount: "",
     });
 
     setErrors({});
@@ -99,29 +99,17 @@ export function CreateOrderForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2">
-        <Label htmlFor="title">Project Title</Label>
-
-        <Input
-          id="title"
-          placeholder="Build NFT Marketplace"
-          value={form.title}
-          onChange={(e) => updateField("title", e.target.value)}
-        />
-
-        {errors.title && (
-          <p className="text-sm text-destructive">{errors.title}</p>
-        )}
-      </div>
-
-      <div className="space-y-2">
         <Label htmlFor="description">Description</Label>
 
         <Textarea
           id="description"
           placeholder="Describe the project requirements..."
-          rows={5}
+          rows={6}
           value={form.description}
-          onChange={(e) => updateField("description", e.target.value)}
+          disabled={isPending}
+          onChange={(event) =>
+            updateField("description", event.target.value)
+          }
         />
 
         {errors.description && (
@@ -132,50 +120,52 @@ export function CreateOrderForm({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="price">Budget (ETH)</Label>
+        <Label htmlFor="amount">Budget (ETH)</Label>
 
         <Input
-          id="price"
+          id="amount"
           type="number"
           min="0"
           step="0.0001"
           placeholder="0.5"
-          value={form.price}
-          onChange={(e) => updateField("price", e.target.value)}
+          value={form.amount}
+          disabled={isPending}
+          onChange={(event) =>
+            updateField("amount", event.target.value)
+          }
         />
 
-        {errors.price && (
-          <p className="text-sm text-destructive">{errors.price}</p>
-        )}
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="seller">Seller Address</Label>
-
-        <Input
-          id="seller"
-          placeholder="0x..."
-          value={form.seller}
-          onChange={(e) => updateField("seller", e.target.value)}
-        />
-
-        {errors.seller && (
-          <p className="text-sm text-destructive">{errors.seller}</p>
+        {errors.amount && (
+          <p className="text-sm text-destructive">
+            {errors.amount}
+          </p>
         )}
       </div>
 
       <div className="flex justify-end gap-3">
         {onCancel && (
-          <Button type="button" variant="outline" onClick={onCancel}>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={isPending}
+            onClick={onCancel}
+          >
             Cancel
           </Button>
         )}
 
-        <Button type="button" variant="secondary" onClick={handleReset}>
+        <Button
+          type="button"
+          variant="secondary"
+          disabled={isPending}
+          onClick={handleReset}
+        >
           Reset
         </Button>
 
-        <Button type="submit">Create Order</Button>
+        <Button type="submit" disabled={isPending}>
+          {isPending ? "Creating..." : "Create Order"}
+        </Button>
       </div>
     </form>
   );

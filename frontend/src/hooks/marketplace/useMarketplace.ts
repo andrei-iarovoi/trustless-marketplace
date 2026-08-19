@@ -1,20 +1,5 @@
-import { useMemo } from "react";
+import { useOrders } from "./useOrders";
 
-import { mockOrders } from "@/data/mockOrders";
-import type { Order } from "@/types/order";
-
-interface UseMarketplaceResult {
-  orders: Order[];
-  isLoading: boolean;
-  error: Error | null;
-}
-
-export function useMarketplace(): UseMarketplaceResult {
-  const orders = useMemo(() => mockOrders, []);
-
-  return {
-    orders,
-    isLoading: false,
-    error: null,
-  };
+export function useMarketplace() {
+  return useOrders();
 }
