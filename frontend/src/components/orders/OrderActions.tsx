@@ -1,4 +1,8 @@
-import { useAcceptOrder, useFundOrder } from "@/hooks/marketplace";
+import {
+  useAcceptOrder,
+  useConfirmCompletion,
+  useFundOrder,
+} from "@/hooks/marketplace";
 import { parseEther } from "viem";
 
 import { Button } from "@/components/ui/button";
@@ -36,6 +40,13 @@ export function OrderActions({
     error: fundError,
   } = useFundOrder();
 
+  const {
+    confirmCompletion,
+    isPending: isCompletePending,
+    isConfirming: isCompleteConfirming,
+    error: completeError,
+  } = useConfirmCompletion();
+
   const canAccept = status === "Open";
   const canFund = status === "Accepted";
   const canComplete = status === "Funded";
@@ -44,11 +55,10 @@ export function OrderActions({
     status === "Accepted" ||
     status === "Funded";
 
-  const isAccepting =
-    isAcceptPending || isAcceptConfirming;
-
-  const isFunding =
-    isFundPending || isFundConfirming;
+  const isAccepting = isAcceptPending || isAcceptConfirming;
+  const isFunding = isFundPending || isFundConfirming;
+  const isCompleting =
+    isCompletePending || isCompleteConfirming;
 
   const handleAccept = () => {
     acceptOrder(orderId);
@@ -59,6 +69,10 @@ export function OrderActions({
       orderId,
       amount: parseEther(budget.toString()),
     });
+  };
+
+  const handleComplete = () => {
+    confirmCompletion(orderId);
   };
 
   return (
@@ -86,10 +100,10 @@ export function OrderActions({
 
         <Button
           className="w-full"
-          disabled={!canComplete}
-          onClick={() => console.log("Complete Order")}
+          disabled={!canComplete || isCompleting}
+          onClick={handleComplete}
         >
-          Complete Order
+          {isCompleting ? "Completing Order..." : "Complete Order"}
         </Button>
 
         <Button
@@ -113,6 +127,12 @@ export function OrderActions({
           </p>
         )}
 
+        {completeError && (
+          <p className="text-sm text-destructive">
+            {completeError.message}
+          </p>
+        )}
+
         {isAcceptConfirming && (
           <p className="text-sm text-slate-400">
             Waiting for Accept transaction confirmation...
@@ -122,6 +142,12 @@ export function OrderActions({
         {isFundConfirming && (
           <p className="text-sm text-slate-400">
             Waiting for Fund transaction confirmation...
+          </p>
+        )}
+
+        {isCompleteConfirming && (
+          <p className="text-sm text-slate-400">
+            Waiting for Complete transaction confirmation...
           </p>
         )}
       </CardContent>

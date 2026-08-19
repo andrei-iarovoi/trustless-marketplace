@@ -5,3 +5,4 @@ export * from "./useOrder";
 export * from "./useCreateOrder";
 export * from "./useAcceptOrder";
 export * from "./useFundOrder";
+export * from "./useConfirmCompletion";
