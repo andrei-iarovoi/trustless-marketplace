@@ -105,7 +105,9 @@ export function OrderDetailsPage() {
             />
           </div>
 
-          <OrderActions status={order.status} />
+          <OrderActions orderId={order.id}
+                        status={order.status} 
+          />
         </CardContent>
       </Card>
     </Container>
