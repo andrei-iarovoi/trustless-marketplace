@@ -1,5 +1,5 @@
-import { useAccount } from "wagmi";
 import { parseEther } from "viem";
+import { useAccount } from "wagmi";
 
 import {
   useAcceptOrder,
@@ -7,6 +7,8 @@ import {
   useConfirmCompletion,
   useFundOrder,
 } from "@/hooks/marketplace";
+
+import { TransactionStatus } from "@/components/web3/TransactionStatus";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -37,40 +39,44 @@ export function OrderActions({
 
   const {
     acceptOrder,
+    hash: acceptHash,
     isPending: isAcceptPending,
     isConfirming: isAcceptConfirming,
+    isSuccess: isAcceptSuccess,
     error: acceptError,
   } = useAcceptOrder();
 
   const {
     fundOrder,
+    hash: fundHash,
     isPending: isFundPending,
     isConfirming: isFundConfirming,
+    isSuccess: isFundSuccess,
     error: fundError,
   } = useFundOrder();
 
   const {
     confirmCompletion,
+    hash: completeHash,
     isPending: isCompletePending,
     isConfirming: isCompleteConfirming,
+    isSuccess: isCompleteSuccess,
     error: completeError,
   } = useConfirmCompletion();
 
   const {
     cancelOrder,
+    hash: cancelHash,
     isPending: isCancelPending,
     isConfirming: isCancelConfirming,
+    isSuccess: isCancelSuccess,
     error: cancelError,
   } = useCancelOrder();
 
   const normalizedAddress = address?.toLowerCase();
   const normalizedClient = client.toLowerCase();
-  // const normalizedFreelancer = freelancer?.toLowerCase();
 
   const isClient = normalizedAddress === normalizedClient;
-  // const isFreelancer =
-  //   normalizedAddress !== undefined &&
-  //   normalizedAddress === normalizedFreelancer;
 
   const canAccept =
     status === "Open" &&
@@ -131,7 +137,7 @@ export function OrderActions({
         <CardTitle>Available Actions</CardTitle>
       </CardHeader>
 
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-4">
         <Button
           className="w-full"
           disabled={!canAccept || isAccepting}
@@ -173,53 +179,39 @@ export function OrderActions({
             : "Cancel Order"}
         </Button>
 
-        {acceptError && (
-          <p className="text-sm text-destructive">
-            {acceptError.message}
-          </p>
-        )}
+        <div className="space-y-2">
+          <TransactionStatus
+            hash={acceptHash}
+            isPending={isAcceptPending}
+            isConfirming={isAcceptConfirming}
+            isSuccess={isAcceptSuccess}
+            error={acceptError}
+          />
 
-        {fundError && (
-          <p className="text-sm text-destructive">
-            {fundError.message}
-          </p>
-        )}
+          <TransactionStatus
+            hash={fundHash}
+            isPending={isFundPending}
+            isConfirming={isFundConfirming}
+            isSuccess={isFundSuccess}
+            error={fundError}
+          />
 
-        {completeError && (
-          <p className="text-sm text-destructive">
-            {completeError.message}
-          </p>
-        )}
+          <TransactionStatus
+            hash={completeHash}
+            isPending={isCompletePending}
+            isConfirming={isCompleteConfirming}
+            isSuccess={isCompleteSuccess}
+            error={completeError}
+          />
 
-        {cancelError && (
-          <p className="text-sm text-destructive">
-            {cancelError.message}
-          </p>
-        )}
-
-        {isAcceptConfirming && (
-          <p className="text-sm text-slate-400">
-            Waiting for Accept transaction confirmation...
-          </p>
-        )}
-
-        {isFundConfirming && (
-          <p className="text-sm text-slate-400">
-            Waiting for Fund transaction confirmation...
-          </p>
-        )}
-
-        {isCompleteConfirming && (
-          <p className="text-sm text-slate-400">
-            Waiting for Complete transaction confirmation...
-          </p>
-        )}
-
-        {isCancelConfirming && (
-          <p className="text-sm text-slate-400">
-            Waiting for Cancel transaction confirmation...
-          </p>
-        )}
+          <TransactionStatus
+            hash={cancelHash}
+            isPending={isCancelPending}
+            isConfirming={isCancelConfirming}
+            isSuccess={isCancelSuccess}
+            error={cancelError}
+          />
+        </div>
       </CardContent>
     </Card>
   );
