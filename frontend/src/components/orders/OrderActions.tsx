@@ -1,5 +1,6 @@
 import {
   useAcceptOrder,
+  useCancelOrder,
   useConfirmCompletion,
   useFundOrder,
 } from "@/hooks/marketplace";
@@ -47,6 +48,13 @@ export function OrderActions({
     error: completeError,
   } = useConfirmCompletion();
 
+  const {
+    cancelOrder,
+    isPending: isCancelPending,
+    isConfirming: isCancelConfirming,
+    error: cancelError,
+  } = useCancelOrder();
+
   const canAccept = status === "Open";
   const canFund = status === "Accepted";
   const canComplete = status === "Funded";
@@ -59,6 +67,8 @@ export function OrderActions({
   const isFunding = isFundPending || isFundConfirming;
   const isCompleting =
     isCompletePending || isCompleteConfirming;
+  const isCancelling =
+    isCancelPending || isCancelConfirming;
 
   const handleAccept = () => {
     acceptOrder(orderId);
@@ -73,6 +83,10 @@ export function OrderActions({
 
   const handleComplete = () => {
     confirmCompletion(orderId);
+  };
+
+  const handleCancel = () => {
+    cancelOrder(orderId);
   };
 
   return (
@@ -103,16 +117,18 @@ export function OrderActions({
           disabled={!canComplete || isCompleting}
           onClick={handleComplete}
         >
-          {isCompleting ? "Completing Order..." : "Complete Order"}
+          {isCompleting
+            ? "Completing Order..."
+            : "Complete Order"}
         </Button>
 
         <Button
           variant="destructive"
           className="w-full"
-          disabled={!canCancel}
-          onClick={() => console.log("Cancel Order")}
+          disabled={!canCancel || isCancelling}
+          onClick={handleCancel}
         >
-          Cancel Order
+          {isCancelling ? "Cancelling Order..." : "Cancel Order"}
         </Button>
 
         {acceptError && (
@@ -133,6 +149,12 @@ export function OrderActions({
           </p>
         )}
 
+        {cancelError && (
+          <p className="text-sm text-destructive">
+            {cancelError.message}
+          </p>
+        )}
+
         {isAcceptConfirming && (
           <p className="text-sm text-slate-400">
             Waiting for Accept transaction confirmation...
@@ -148,6 +170,12 @@ export function OrderActions({
         {isCompleteConfirming && (
           <p className="text-sm text-slate-400">
             Waiting for Complete transaction confirmation...
+          </p>
+        )}
+
+        {isCancelConfirming && (
+          <p className="text-sm text-slate-400">
+            Waiting for Cancel transaction confirmation...
           </p>
         )}
       </CardContent>

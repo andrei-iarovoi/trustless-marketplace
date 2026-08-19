@@ -6,3 +6,4 @@ export * from "./useCreateOrder";
 export * from "./useAcceptOrder";
 export * from "./useFundOrder";
 export * from "./useConfirmCompletion";
+export * from "./useCancelOrder";
