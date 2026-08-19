@@ -65,25 +65,32 @@ export function MyOrdersPage() {
   }, [orders, normalizedAddress, role]);
 
   const filteredOrders = useMemo(() => {
-    return myOrders.filter((order) => {
-      const matchesSearch =
-        normalizedSearch.length === 0 ||
-        [
-          order.id.toString(),
-          order.client,
-          order.freelancer ?? "",
-          order.status,
-        ]
-          .join(" ")
-          .toLowerCase()
-          .includes(normalizedSearch);
+  const isNumericSearch = /^\d+$/.test(normalizedSearch);
+  const searchOrderId = isNumericSearch
+    ? Number(normalizedSearch)
+    : undefined;
 
-      const matchesStatus =
-        status === "All" || order.status === status;
+  return myOrders.filter((order) => {
+    const matchesSearch =
+      normalizedSearch.length === 0 ||
+      (isNumericSearch
+        ? order.id === searchOrderId
+        : [
+            order.description,
+            order.client,
+            order.freelancer ?? "",
+            order.status,
+          ]
+            .join(" ")
+            .toLowerCase()
+            .includes(normalizedSearch));
 
-      return matchesSearch && matchesStatus;
-    });
-  }, [myOrders, normalizedSearch, status]);
+    const matchesStatus =
+      status === "All" || order.status === status;
+
+    return matchesSearch && matchesStatus;
+  });
+}, [myOrders, normalizedSearch, status]);
 
   if (!address) {
     return (

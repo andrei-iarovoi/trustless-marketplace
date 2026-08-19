@@ -7,13 +7,20 @@ import { Link, useParams } from "react-router";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Container } from "@/components/layout/Container";
 import { OrderActions } from "@/components/orders/OrderActions";
 import { useOrder } from "@/hooks/marketplace";
 
 function formatAddress(address?: string) {
-  if (!address) return "Not assigned";
+  if (!address) {
+    return "Not assigned";
+  }
 
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
@@ -22,25 +29,45 @@ export function OrderDetailsPage() {
   const { orderId } = useParams();
 
   const id = Number(orderId);
+  const isValidId = Number.isInteger(id) && id > 0;
 
-  const { order, isLoading } = useOrder(id);
+  const {
+    order,
+    isLoading,
+    error,
+  } = useOrder(isValidId ? id : undefined);
+
+  if (!isValidId) {
+    return <OrderNotFound />;
+  }
 
   if (isLoading) {
     return (
-      <Container className="py-12 text-center text-slate-400">
-        Loading order...
+      <Container className="py-12">
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-10 text-center">
+          <p className="text-slate-400">
+            Loading order...
+          </p>
+        </div>
       </Container>
     );
   }
 
-  if (!order) {
+  if (error) {
     return (
       <Container className="py-12">
         <Card className="mx-auto max-w-2xl">
           <CardContent className="space-y-6 py-10 text-center">
-            <h1 className="text-2xl font-bold">
-              Order not found
-            </h1>
+            <div>
+              <h1 className="text-2xl font-bold text-slate-100">
+                Unable to load order
+              </h1>
+
+              <p className="mt-2 text-sm text-slate-500">
+                Something went wrong while reading the order from the
+                blockchain.
+              </p>
+            </div>
 
             <Button asChild>
               <Link to="/marketplace">
@@ -54,6 +81,10 @@ export function OrderDetailsPage() {
     );
   }
 
+  if (!order) {
+    return <OrderNotFound />;
+  }
+
   return (
     <Container className="space-y-8 py-12">
       <Button asChild variant="ghost">
@@ -64,9 +95,9 @@ export function OrderDetailsPage() {
       </Button>
 
       <Card>
-        <CardHeader className="flex flex-row items-start justify-between gap-6">
-          <div>
-            <CardTitle className="text-3xl">
+        <CardHeader className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <CardTitle className="break-words text-3xl text-slate-50">
               {order.description}
             </CardTitle>
 
@@ -75,7 +106,9 @@ export function OrderDetailsPage() {
             </p>
           </div>
 
-          <Badge>{order.status}</Badge>
+          <Badge variant={getStatusVariant(order.status)}>
+            {order.status}
+          </Badge>
         </CardHeader>
 
         <CardContent className="space-y-8">
@@ -105,16 +138,58 @@ export function OrderDetailsPage() {
             />
           </div>
 
-          <OrderActions orderId={order.id}
-                        amount={order.amount}
-                        client={order.client}
-                        freelancer={order.freelancer}
-                        status={order.status}
+          <OrderActions
+            orderId={order.id}
+            amount={order.amount}
+            client={order.client}
+            freelancer={order.freelancer}
+            status={order.status}
           />
         </CardContent>
       </Card>
     </Container>
   );
+}
+
+function OrderNotFound() {
+  return (
+    <Container className="py-12">
+      <Card className="mx-auto max-w-2xl">
+        <CardContent className="space-y-6 py-10 text-center">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-100">
+              Order not found
+            </h1>
+
+            <p className="mt-2 text-sm text-slate-500">
+              The requested escrow order does not exist.
+            </p>
+          </div>
+
+          <Button asChild>
+            <Link to="/marketplace">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Marketplace
+            </Link>
+          </Button>
+        </CardContent>
+      </Card>
+    </Container>
+  );
+}
+
+function getStatusVariant(
+  status: "Open" | "Accepted" | "Funded" | "Completed" | "Cancelled",
+) {
+  const variants = {
+    Open: "success",
+    Accepted: "secondary",
+    Funded: "default",
+    Completed: "outline",
+    Cancelled: "destructive",
+  } as const;
+
+  return variants[status];
 }
 
 type InfoCardProps = {
@@ -123,18 +198,22 @@ type InfoCardProps = {
   value: string;
 };
 
-function InfoCard({ icon, label, value }: InfoCardProps) {
+function InfoCard({
+  icon,
+  label,
+  value,
+}: InfoCardProps) {
   return (
-    <div className="rounded-xl border p-5">
+    <div className="rounded-xl border border-slate-800 bg-slate-950/30 p-5">
       <div className="mb-3 text-cyan-400">
         {icon}
       </div>
 
-      <p className="text-sm text-muted-foreground">
+      <p className="text-sm text-slate-500">
         {label}
       </p>
 
-      <p className="mt-1 break-all font-medium">
+      <p className="mt-1 break-all font-medium text-slate-100">
         {value}
       </p>
     </div>
