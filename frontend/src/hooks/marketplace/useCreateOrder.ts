@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   useAccount,
   useWaitForTransactionReceipt,
@@ -6,6 +7,7 @@ import {
 import { sepolia } from "wagmi/chains";
 
 import { marketplaceConfig } from "@/contracts";
+import { useInvalidateMarketplace } from "./useInvalidateMarketplace";
 
 type CreateOrderParams = {
   description: string;
@@ -14,6 +16,7 @@ type CreateOrderParams = {
 
 export function useCreateOrder() {
   const { address } = useAccount();
+  const { invalidateMarketplace } = useInvalidateMarketplace();
 
   const {
     data: hash,
@@ -30,6 +33,14 @@ export function useCreateOrder() {
     hash,
   });
 
+  useEffect(() => {
+    if (!isSuccess) {
+      return;
+    }
+
+    void invalidateMarketplace();
+  }, [isSuccess, invalidateMarketplace]);
+
   const createOrder = ({
     description,
     amount,
@@ -39,8 +50,7 @@ export function useCreateOrder() {
     }
 
     writeContract({
-      address: marketplaceConfig.address,
-      abi: marketplaceConfig.abi,
+      ...marketplaceConfig,
       functionName: "createOrder",
       args: [description, amount],
       account: address,

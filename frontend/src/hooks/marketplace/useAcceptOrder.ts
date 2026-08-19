@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   useAccount,
   useWaitForTransactionReceipt,
@@ -6,9 +7,11 @@ import {
 import { sepolia } from "wagmi/chains";
 
 import { marketplaceConfig } from "@/contracts";
+import { useInvalidateMarketplace } from "./useInvalidateMarketplace";
 
 export function useAcceptOrder() {
   const { address } = useAccount();
+  const { invalidateMarketplace } = useInvalidateMarketplace();
 
   const {
     data: hash,
@@ -24,6 +27,14 @@ export function useAcceptOrder() {
   } = useWaitForTransactionReceipt({
     hash,
   });
+
+  useEffect(() => {
+    if (!isSuccess) {
+      return;
+    }
+
+    void invalidateMarketplace();
+  }, [isSuccess, invalidateMarketplace]);
 
   const acceptOrder = (orderId: number) => {
     if (!address) {
