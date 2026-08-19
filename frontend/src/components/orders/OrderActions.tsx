@@ -1,4 +1,5 @@
-import { useAcceptOrder } from "@/hooks/marketplace";
+import { useAcceptOrder, useFundOrder } from "@/hooks/marketplace";
+import { parseEther } from "viem";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -12,11 +13,13 @@ import type { OrderStatus } from "@/types/order";
 
 interface OrderActionsProps {
   orderId: number;
+  budget: number;
   status: OrderStatus;
 }
 
 export function OrderActions({
   orderId,
+  budget,
   status,
 }: OrderActionsProps) {
   const {
@@ -26,6 +29,13 @@ export function OrderActions({
     error: acceptError,
   } = useAcceptOrder();
 
+  const {
+    fundOrder,
+    isPending: isFundPending,
+    isConfirming: isFundConfirming,
+    error: fundError,
+  } = useFundOrder();
+
   const canAccept = status === "Open";
   const canFund = status === "Accepted";
   const canComplete = status === "Funded";
@@ -34,12 +44,22 @@ export function OrderActions({
     status === "Accepted" ||
     status === "Funded";
 
+  const isAccepting =
+    isAcceptPending || isAcceptConfirming;
+
+  const isFunding =
+    isFundPending || isFundConfirming;
+
   const handleAccept = () => {
     acceptOrder(orderId);
   };
 
-  const isAccepting =
-    isAcceptPending || isAcceptConfirming;
+  const handleFund = () => {
+    fundOrder({
+      orderId,
+      amount: parseEther(budget.toString()),
+    });
+  };
 
   return (
     <Card>
@@ -58,10 +78,10 @@ export function OrderActions({
 
         <Button
           className="w-full"
-          disabled={!canFund}
-          onClick={() => console.log("Fund Order")}
+          disabled={!canFund || isFunding}
+          onClick={handleFund}
         >
-          Fund Escrow
+          {isFunding ? "Funding Escrow..." : "Fund Escrow"}
         </Button>
 
         <Button
@@ -87,9 +107,21 @@ export function OrderActions({
           </p>
         )}
 
+        {fundError && (
+          <p className="text-sm text-destructive">
+            {fundError.message}
+          </p>
+        )}
+
         {isAcceptConfirming && (
           <p className="text-sm text-slate-400">
-            Waiting for transaction confirmation...
+            Waiting for Accept transaction confirmation...
+          </p>
+        )}
+
+        {isFundConfirming && (
+          <p className="text-sm text-slate-400">
+            Waiting for Fund transaction confirmation...
           </p>
         )}
       </CardContent>
