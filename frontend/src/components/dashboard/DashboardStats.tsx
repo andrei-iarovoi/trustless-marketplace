@@ -11,21 +11,13 @@ import type { Order } from "@/types/order";
 type DashboardStatsProps = {
   orders: Order[];
   balance: string;
-  address?: string;
 };
 
 export function DashboardStats({
   orders,
   balance,
-  address,
 }: DashboardStatsProps) {
-  const normalizedAddress = address?.toLowerCase();
-
-  const createdOrders = orders.filter(
-    (order) =>
-      normalizedAddress &&
-      order.client.toLowerCase() === normalizedAddress,
-  ).length;
+  const myOrders = orders.length;
 
   const acceptedOrders = orders.filter(
     (order) => order.status === "Accepted",
@@ -46,8 +38,8 @@ export function DashboardStats({
 
       <StatCard
         title="My Orders"
-        value={createdOrders.toString()}
-        description="Orders created by you"
+        value={myOrders.toString()}
+        description="Orders associated with your wallet"
         icon={<ClipboardList size={18} />}
       />
 

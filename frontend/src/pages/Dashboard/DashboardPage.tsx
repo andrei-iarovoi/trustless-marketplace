@@ -91,7 +91,6 @@ export function DashboardPage() {
             <DashboardStats
              orders={orders}
              balance={balance}
-             address={address}
         />
 
             <RecentOrders orders={orders} />

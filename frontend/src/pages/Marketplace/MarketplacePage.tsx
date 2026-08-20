@@ -27,11 +27,13 @@ export function MarketplacePage() {
       const matchesSearch =
         normalizedSearch.length === 0 ||
         [
+          order.id.toString(),
+          order.id.toString().padStart(3, "0"),
           order.description,
           order.client,
           order.freelancer ?? "",
           order.status,
-        ]
+]
           .join(" ")
           .toLowerCase()
           .includes(normalizedSearch);
