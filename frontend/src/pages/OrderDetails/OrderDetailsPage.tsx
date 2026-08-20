@@ -142,7 +142,6 @@ export function OrderDetailsPage() {
             orderId={order.id}
             amount={order.amount}
             client={order.client}
-            freelancer={order.freelancer}
             status={order.status}
           />
         </CardContent>

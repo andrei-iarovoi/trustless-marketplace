@@ -14,11 +14,12 @@ export function useConfirmCompletion() {
   const { invalidateMarketplace } = useInvalidateMarketplace();
 
   const {
-    data: hash,
-    writeContract,
-    isPending,
-    error,
-  } = useWriteContract();
+  data: hash,
+  writeContractAsync,
+  isPending,
+  error,
+  reset,
+} = useWriteContract();
 
   const {
     isLoading: isConfirming,
@@ -36,19 +37,19 @@ export function useConfirmCompletion() {
     void invalidateMarketplace();
   }, [isSuccess, invalidateMarketplace]);
 
-  const confirmCompletion = (orderId: number) => {
-    if (!address) {
-      throw new Error("Wallet is not connected.");
-    }
+  const confirmCompletion = async (orderId: number) => {
+  if (!address) {
+    throw new Error("Wallet is not connected.");
+  }
 
-    writeContract({
-      ...marketplaceConfig,
-      functionName: "confirmCompletion",
-      args: [BigInt(orderId)],
-      account: address,
-      chain: sepolia,
-    });
-  };
+  return writeContractAsync({
+    ...marketplaceConfig,
+    functionName: "confirmCompletion",
+    args: [BigInt(orderId)],
+    account: address,
+    chain: sepolia,
+  });
+};
 
   return {
     confirmCompletion,
@@ -57,5 +58,6 @@ export function useConfirmCompletion() {
     isConfirming,
     isSuccess,
     error: error ?? receiptError ?? null,
+    reset,
   };
 }

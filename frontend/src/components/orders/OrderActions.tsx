@@ -24,7 +24,6 @@ interface OrderActionsProps {
   orderId: number;
   amount: number;
   client: string;
-  freelancer?: string;
   status: OrderStatus;
 }
 
@@ -32,7 +31,6 @@ export function OrderActions({
   orderId,
   amount,
   client,
-  // freelancer,
   status,
 }: OrderActionsProps) {
   const { address } = useAccount();
@@ -112,6 +110,12 @@ export function OrderActions({
   const isCancelling =
     isCancelPending || isCancelConfirming;
 
+  const isTransactionPending =
+    isAccepting ||
+    isFunding ||
+    isCompleting ||
+    isCancelling;
+
   const handleAccept = () => {
     acceptOrder(orderId);
   };
@@ -140,7 +144,7 @@ export function OrderActions({
       <CardContent className="space-y-4">
         <Button
           className="w-full"
-          disabled={!canAccept || isAccepting}
+          disabled={!canAccept || isTransactionPending}
           onClick={handleAccept}
         >
           {isAccepting
@@ -150,7 +154,7 @@ export function OrderActions({
 
         <Button
           className="w-full"
-          disabled={!canFund || isFunding}
+          disabled={!canFund || isTransactionPending}
           onClick={handleFund}
         >
           {isFunding
@@ -160,7 +164,7 @@ export function OrderActions({
 
         <Button
           className="w-full"
-          disabled={!canComplete || isCompleting}
+          disabled={!canComplete || isTransactionPending}
           onClick={handleComplete}
         >
           {isCompleting
@@ -171,7 +175,7 @@ export function OrderActions({
         <Button
           variant="destructive"
           className="w-full"
-          disabled={!canCancel || isCancelling}
+          disabled={!canCancel || isTransactionPending}
           onClick={handleCancel}
         >
           {isCancelling
