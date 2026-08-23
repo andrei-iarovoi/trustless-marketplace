@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/card";
 import { Container } from "@/components/layout/Container";
 import { OrderActions } from "@/components/orders/OrderActions";
+import { OrderLifecycle } from "@/components/orders/OrderLifecycle";
 import { useOrder } from "@/hooks/marketplace";
 
 function formatAddress(address?: string) {
@@ -112,6 +113,8 @@ export function OrderDetailsPage() {
         </CardHeader>
 
         <CardContent className="space-y-8">
+          <OrderLifecycle status={order.status} />
+
           <div className="grid gap-4 md:grid-cols-2">
             <InfoCard
               icon={<CircleDollarSign className="h-5 w-5" />}
@@ -129,12 +132,6 @@ export function OrderDetailsPage() {
               icon={<UserRound className="h-5 w-5" />}
               label="Freelancer"
               value={formatAddress(order.freelancer)}
-            />
-
-            <InfoCard
-              icon={<CircleDollarSign className="h-5 w-5" />}
-              label="Status"
-              value={order.status}
             />
           </div>
 

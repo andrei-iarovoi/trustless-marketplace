@@ -34,7 +34,6 @@ export function CreateOrderDialog() {
         amount: parseEther(data.amount),
       });
     } catch {
-      // Ошибка уже доступна через useCreateOrder().
     }
   };
 
