@@ -17,6 +17,7 @@ import { Container } from "@/components/layout/Container";
 import { OrderActions } from "@/components/orders/OrderActions";
 import { OrderLifecycle } from "@/components/orders/OrderLifecycle";
 import { useOrder } from "@/hooks/marketplace";
+import { OrderDetailsSkeleton } from "@/components/orders/OrderDetailsSkeleton";
 
 function formatAddress(address?: string) {
   if (!address) {
@@ -43,16 +44,8 @@ export function OrderDetailsPage() {
   }
 
   if (isLoading) {
-    return (
-      <Container className="py-12">
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-10 text-center">
-          <p className="text-slate-400">
-            Loading order...
-          </p>
-        </div>
-      </Container>
-    );
-  }
+  return <OrderDetailsSkeleton />;
+}
 
   if (error) {
     return (

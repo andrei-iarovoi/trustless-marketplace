@@ -4,6 +4,7 @@ import { DashboardStats } from "@/components/dashboard/DashboardStats";
 import { Container } from "@/components/ui/Container";
 import { useMyOrders, useWalletBalance } from "@/hooks/dashboard";
 import { RecentOrders } from "@/components/dashboard/RecentOrders";
+import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton";
 
 export function DashboardPage() {
   const {
@@ -83,10 +84,8 @@ export function DashboardPage() {
       </section>
 
       {isLoading ? (
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-8 text-center text-slate-500">
-          Loading dashboard...
-        </div>
-      ) : (
+            <DashboardSkeleton />
+            ) : (
         <div className="space-y-8">
             <DashboardStats
              orders={orders}

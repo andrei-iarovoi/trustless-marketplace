@@ -13,6 +13,7 @@ import { CreateOrderDialog } from "@/components/orders/CreateOrderDialog";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useOrders } from "@/hooks/marketplace";
+import { OrderCardSkeleton } from "@/components/orders/OrderCardSkeleton";
 
 export function MarketplacePage() {
   const [search, setSearch] = useState("");
@@ -75,10 +76,12 @@ export function MarketplacePage() {
         </div>
 
         {isLoading ? (
-          <div className="py-20 text-center text-slate-400">
-            Loading orders...
-          </div>
-        ) : filteredOrders.length > 0 ? (
+  <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+    {Array.from({ length: 6 }).map((_, index) => (
+      <OrderCardSkeleton key={index} />
+    ))}
+  </div>
+) : filteredOrders.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {filteredOrders.map((order) => (
               <OrderCard key={order.id} order={order} />
