@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
 
 import { wagmiConfig } from "@/config/wagmi";
+import { ToastProvider } from "@/providers/ToastProvider";
 
 import "@rainbow-me/rainbowkit/styles.css";
 
@@ -19,7 +20,7 @@ export function AppProviders({ children }: AppProvidersProps) {
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider>
-          {children}
+          <ToastProvider>{children}</ToastProvider>
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

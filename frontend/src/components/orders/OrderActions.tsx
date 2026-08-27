@@ -185,6 +185,7 @@ export function OrderActions({
 
         <div className="space-y-2">
           <TransactionStatus
+            label="Accept order"
             hash={acceptHash}
             isPending={isAcceptPending}
             isConfirming={isAcceptConfirming}
@@ -193,6 +194,7 @@ export function OrderActions({
           />
 
           <TransactionStatus
+            label="Fund escrow"
             hash={fundHash}
             isPending={isFundPending}
             isConfirming={isFundConfirming}
@@ -201,6 +203,7 @@ export function OrderActions({
           />
 
           <TransactionStatus
+            label="Complete order"
             hash={completeHash}
             isPending={isCompletePending}
             isConfirming={isCompleteConfirming}
@@ -209,6 +212,7 @@ export function OrderActions({
           />
 
           <TransactionStatus
+            label="Cancel order"
             hash={cancelHash}
             isPending={isCancelPending}
             isConfirming={isCancelConfirming}
