@@ -7,6 +7,7 @@ import {
 import { sepolia } from "wagmi/chains";
 
 import { marketplaceConfig } from "@/contracts";
+import { useTransactionToast } from "@/hooks/web3/useTransactionToast";
 import { useInvalidateMarketplace } from "./useInvalidateMarketplace";
 
 type FundOrderParams = {
@@ -31,6 +32,17 @@ export function useFundOrder() {
     error: receiptError,
   } = useWaitForTransactionReceipt({
     hash,
+  });
+
+  const transactionError = error ?? receiptError ?? null;
+
+  useTransactionToast({
+    label: "Fund escrow",
+    hash,
+    isPending,
+    isConfirming,
+    isSuccess,
+    error: transactionError,
   });
 
   useEffect(() => {
@@ -65,6 +77,6 @@ export function useFundOrder() {
     isPending,
     isConfirming,
     isSuccess,
-    error: error ?? receiptError ?? null,
+    error: transactionError,
   };
 }

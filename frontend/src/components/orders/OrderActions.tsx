@@ -9,7 +9,6 @@ import {
   useFundOrder,
 } from "@/hooks/marketplace";
 
-import { TransactionStatus } from "@/components/web3/TransactionStatus";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -50,38 +49,26 @@ export function OrderActions({
 
   const {
     acceptOrder,
-    hash: acceptHash,
     isPending: isAcceptPending,
     isConfirming: isAcceptConfirming,
-    isSuccess: isAcceptSuccess,
-    error: acceptError,
   } = useAcceptOrder();
 
   const {
     fundOrder,
-    hash: fundHash,
     isPending: isFundPending,
     isConfirming: isFundConfirming,
-    isSuccess: isFundSuccess,
-    error: fundError,
   } = useFundOrder();
 
   const {
     confirmCompletion,
-    hash: completeHash,
     isPending: isCompletePending,
     isConfirming: isCompleteConfirming,
-    isSuccess: isCompleteSuccess,
-    error: completeError,
   } = useConfirmCompletion();
 
   const {
     cancelOrder,
-    hash: cancelHash,
     isPending: isCancelPending,
     isConfirming: isCancelConfirming,
-    isSuccess: isCancelSuccess,
-    error: cancelError,
   } = useCancelOrder();
 
   const normalizedAddress = address?.toLowerCase();
@@ -188,43 +175,6 @@ export function OrderActions({
           />
         ))}
 
-        <div className="space-y-2">
-          <TransactionStatus
-            label="Accept order"
-            hash={acceptHash}
-            isPending={isAcceptPending}
-            isConfirming={isAcceptConfirming}
-            isSuccess={isAcceptSuccess}
-            error={acceptError}
-          />
-
-          <TransactionStatus
-            label="Fund escrow"
-            hash={fundHash}
-            isPending={isFundPending}
-            isConfirming={isFundConfirming}
-            isSuccess={isFundSuccess}
-            error={fundError}
-          />
-
-          <TransactionStatus
-            label="Complete order"
-            hash={completeHash}
-            isPending={isCompletePending}
-            isConfirming={isCompleteConfirming}
-            isSuccess={isCompleteSuccess}
-            error={completeError}
-          />
-
-          <TransactionStatus
-            label="Cancel order"
-            hash={cancelHash}
-            isPending={isCancelPending}
-            isConfirming={isCancelConfirming}
-            isSuccess={isCancelSuccess}
-            error={cancelError}
-          />
-        </div>
       </CardContent>
     </Card>
   );

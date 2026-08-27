@@ -7,6 +7,7 @@ import {
 import { sepolia } from "wagmi/chains";
 
 import { marketplaceConfig } from "@/contracts";
+import { useTransactionToast } from "@/hooks/web3/useTransactionToast";
 import { useInvalidateMarketplace } from "./useInvalidateMarketplace";
 
 export function useAcceptOrder() {
@@ -26,6 +27,17 @@ export function useAcceptOrder() {
     error: receiptError,
   } = useWaitForTransactionReceipt({
     hash,
+  });
+
+  const transactionError = error ?? receiptError ?? null;
+
+  useTransactionToast({
+    label: "Accept order",
+    hash,
+    isPending,
+    isConfirming,
+    isSuccess,
+    error: transactionError,
   });
 
   useEffect(() => {
@@ -56,6 +68,6 @@ export function useAcceptOrder() {
     isPending,
     isConfirming,
     isSuccess,
-    error: error ?? receiptError ?? null,
+    error: transactionError,
   };
 }

@@ -1,4 +1,4 @@
-import { CheckCircle2, ExternalLink, X, XCircle } from "lucide-react";
+import { CheckCircle2, ExternalLink, Loader2, X, XCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -7,7 +7,7 @@ export type ToastItem = {
   id: string;
   title: string;
   description?: string;
-  variant: "success" | "error";
+  variant: "success" | "error" | "pending";
   action?: {
     label: string;
     href: string;
@@ -44,22 +44,25 @@ type ToastCardProps = {
 
 function ToastCard({ toast, onDismiss }: ToastCardProps) {
   const isSuccess = toast.variant === "success";
-  const Icon = isSuccess ? CheckCircle2 : XCircle;
+  const isPending = toast.variant === "pending";
+  const Icon = isSuccess ? CheckCircle2 : isPending ? Loader2 : XCircle;
 
   return (
     <div
       className={cn(
         "rounded-2xl border bg-background/95 p-4 shadow-2xl shadow-black/30 backdrop-blur supports-[backdrop-filter]:bg-background/85",
-        isSuccess
-          ? "border-emerald-500/25 shadow-emerald-950/20"
-          : "border-red-500/25 shadow-red-950/20",
+        isSuccess && "border-emerald-500/25 shadow-emerald-950/20",
+        isPending && "border-cyan-500/25 shadow-cyan-950/20",
+        toast.variant === "error" && "border-red-500/25 shadow-red-950/20",
       )}
     >
       <div className="flex items-start gap-3">
         <Icon
           className={cn(
             "mt-0.5 size-4 shrink-0",
-            isSuccess ? "text-emerald-400" : "text-red-400",
+            isSuccess && "text-emerald-400",
+            isPending && "animate-spin text-cyan-300",
+            toast.variant === "error" && "text-red-400",
           )}
         />
 
@@ -67,7 +70,9 @@ function ToastCard({ toast, onDismiss }: ToastCardProps) {
           <p
             className={cn(
               "text-sm font-medium",
-              isSuccess ? "text-emerald-300" : "text-red-300",
+              isSuccess && "text-emerald-300",
+              isPending && "text-cyan-200",
+              toast.variant === "error" && "text-red-300",
             )}
           >
             {toast.title}
