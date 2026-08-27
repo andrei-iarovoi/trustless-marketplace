@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { parseEther } from "viem";
 
 import {
@@ -27,14 +27,17 @@ export function CreateOrderDialog() {
     error,
   } = useCreateOrder();
 
-  const handleSubmit = async (data: CreateOrderFormData) => {
-    try {
-      await createOrder({
-        description: data.description,
-        amount: parseEther(data.amount),
-      });
-    } catch {
+  useEffect(() => {
+    if (isSuccess && open) {
+      setOpen(false);
     }
+  }, [isSuccess, open]);
+
+  const handleSubmit = (data: CreateOrderFormData) => {
+    createOrder({
+      description: data.description,
+      amount: parseEther(data.amount),
+    });
   };
 
   const handleOpenChange = (nextOpen: boolean) => {
@@ -44,10 +47,6 @@ export function CreateOrderDialog() {
 
     setOpen(nextOpen);
   };
-
-  if (isSuccess && open) {
-    setOpen(false);
-  }
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
