@@ -3,6 +3,7 @@ import { Link } from "react-router";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   Card,
   CardContent,
@@ -55,20 +56,12 @@ export function RecentOrders({ orders }: RecentOrdersProps) {
 
       <CardContent>
         {recentOrders.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-slate-800 p-8 text-center">
-            <ShieldCheck
-              size={24}
-              className="mx-auto text-slate-600"
-            />
-
-            <p className="mt-3 font-medium text-slate-300">
-              No orders yet
-            </p>
-
-            <p className="mt-1 text-sm text-slate-500">
-              Your escrow orders will appear here.
-            </p>
-          </div>
+          <EmptyState
+            className="py-10"
+            icon={<ShieldCheck size={24} />}
+            title="No orders yet"
+            description="Your escrow orders will appear here after you create or accept an order."
+          />
         ) : (
           <div className="divide-y divide-slate-800">
             {recentOrders.map((order) => (

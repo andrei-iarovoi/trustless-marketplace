@@ -5,6 +5,7 @@ import { Container } from "@/components/ui/Container";
 import { useMyOrders, useWalletBalance } from "@/hooks/dashboard";
 import { RecentOrders } from "@/components/dashboard/RecentOrders";
 import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export function DashboardPage() {
   const {
@@ -37,21 +38,12 @@ export function DashboardPage() {
           </p>
         </section>
 
-        <div className="flex max-w-xl items-center gap-4 rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-          <div className="flex size-12 shrink-0 items-center justify-center rounded-xl border border-cyan-500/20 bg-cyan-500/10 text-cyan-300">
-            <Wallet size={22} />
-          </div>
-
-          <div>
-            <p className="font-medium text-slate-100">
-              Wallet not connected
-            </p>
-
-            <p className="mt-1 text-sm text-slate-500">
-              Connect your wallet to access your dashboard.
-            </p>
-          </div>
-        </div>
+        <EmptyState
+          className="max-w-xl"
+          icon={<Wallet size={24} />}
+          title="Wallet not connected"
+          description="Connect your wallet to view your balance, escrow orders, and recent marketplace activity."
+        />
       </Container>
     );
   }

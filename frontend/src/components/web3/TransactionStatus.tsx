@@ -25,6 +25,24 @@ function getExplorerUrl(hash: string) {
   return `${SEPOLIA_EXPLORER}${hash}`;
 }
 
+function getTransactionErrorMessage(error: Error) {
+  const message = error.message;
+
+  if (message.toLowerCase().includes("user rejected")) {
+    return "Transaction was rejected in the wallet.";
+  }
+
+  if (message.toLowerCase().includes("insufficient funds")) {
+    return "Insufficient funds for this transaction.";
+  }
+
+  if (message.length > 180) {
+    return `${message.slice(0, 177)}...`;
+  }
+
+  return message;
+}
+
 export function TransactionStatus({
   label,
   hash,
@@ -35,6 +53,7 @@ export function TransactionStatus({
   autoDismissMs = DEFAULT_SUCCESS_DISMISS_MS,
 }: TransactionStatusProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const lastSubmittedToastHashRef = useRef<string | null>(null);
   const lastSuccessToastHashRef = useRef<string | null>(null);
   const lastErrorToastMessageRef = useRef<string | null>(null);
   const { showToast } = useToast();
@@ -44,6 +63,25 @@ export function TransactionStatus({
       setIsVisible(true);
     }
   }, [error, hash, isConfirming, isPending, isSuccess]);
+
+  useEffect(() => {
+    if (!hash || lastSubmittedToastHashRef.current === hash) {
+      return;
+    }
+
+    lastSubmittedToastHashRef.current = hash;
+
+    showToast({
+      title: `${label} submitted`,
+      description: `Transaction ${formatHash(hash)} was sent to Sepolia.`,
+      variant: "success",
+      durationMs: autoDismissMs,
+      action: {
+        label: `View ${formatHash(hash)} on Etherscan`,
+        href: getExplorerUrl(hash),
+      },
+    });
+  }, [autoDismissMs, hash, label, showToast]);
 
   useEffect(() => {
     if (!isSuccess || !hash || lastSuccessToastHashRef.current === hash) {
@@ -74,7 +112,7 @@ export function TransactionStatus({
 
     showToast({
       title: `${label} failed`,
-      description: error.message,
+      description: getTransactionErrorMessage(error),
       variant: "error",
       durationMs: autoDismissMs,
       action: hash
@@ -117,7 +155,7 @@ export function TransactionStatus({
             </p>
 
             <p className="mt-1 break-words text-xs leading-5 text-slate-500">
-              {error.message}
+              {getTransactionErrorMessage(error)}
             </p>
 
             {hash ? <TransactionLink hash={hash} /> : null}

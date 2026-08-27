@@ -4,10 +4,12 @@ import { Link } from "react-router";
 import { useAccount } from "wagmi";
 
 import { useOrders } from "@/hooks/marketplace";
+import { MyOrdersSkeleton } from "@/components/orders/MyOrdersSkeleton";
 import { Container } from "@/components/ui/Container";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import { SearchBar } from "@/components/marketplace/SearchBar";
 import {
   StatusFilter,
@@ -109,19 +111,11 @@ export function MyOrdersPage() {
           </p>
         </section>
 
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <ShieldCheck size={28} className="text-slate-600" />
-
-            <h2 className="mt-4 text-lg font-medium text-slate-200">
-              Wallet not connected
-            </h2>
-
-            <p className="mt-2 text-sm text-slate-500">
-              Connect your wallet to access your orders.
-            </p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={<ShieldCheck size={24} />}
+          title="Wallet not connected"
+          description="Connect your wallet to access orders you created or accepted as a freelancer."
+        />
       </Container>
     );
   }
@@ -175,26 +169,15 @@ export function MyOrdersPage() {
       </section>
 
       {isLoading ? (
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-10 text-center text-slate-500">
-          Loading orders...
-        </div>
+        <MyOrdersSkeleton />
       ) : filteredOrders.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <ClipboardList size={28} className="text-slate-600" />
-
-            <h2 className="mt-4 text-lg font-medium text-slate-200">
-              No orders found
-            </h2>
-
-            <p className="mt-2 max-w-md text-sm text-slate-500">
-              No orders match the selected filters. Try changing the status,
-              role, or search query.
-            </p>
-
+        <EmptyState
+          icon={<ClipboardList size={24} />}
+          title="No orders found"
+          description="No orders match the selected filters. Try changing the status, role, or search query."
+          action={
             <Button
               variant="secondary"
-              className="mt-6"
               onClick={() => {
                 setSearch("");
                 setStatus("All");
@@ -203,8 +186,8 @@ export function MyOrdersPage() {
             >
               Clear filters
             </Button>
-          </CardContent>
-        </Card>
+          }
+        />
       ) : (
         <div className="space-y-4">
           {filteredOrders.map((order) => (
